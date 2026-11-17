@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <link rel="icon" href="data:," />
+  <title>Georgia Contest Scout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f4f1;
+      --surface: #ffffff;
+      --surface-2: #ecece7;
+      --text: #151514;
+      --muted: #65645f;
+      --line: #d5d4cc;
+      --gold: #8d6900;
+      --gold-strong: #6f5200;
+      --gold-soft: #f1e5b9;
+      --warning: #9b2f24;
+      --warning-soft: #f9ded8;
+      --good: #216a48;
+      --good-soft: #dcefe5;
+      --shadow: 0 16px 42px rgba(32, 29, 18, .10);
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 14px;
+      --max: 1180px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0f;
+        --surface: #131319;
+        --surface-2: #1b1b22;
+        --text: #f4f1e8;
+        --muted: #b0ada4;
+        --line: #303039;
+        --gold: #d4af37;
+        --gold-strong: #efd372;
+        --gold-soft: #2c2718;
+        --warning: #ff8f7f;
+        --warning-soft: #301d1c;
+        --good: #7bd4a8;
+        --good-soft: #15291f;
+        --shadow: 0 24px 64px rgba(0, 0, 0, .32);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 0;
+      background:
+        radial-gradient(circle at 88% -4%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 31rem),
+        var(--bg);
+      color: var(--text);
+      font: 400 16px/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .wrap { width: min(calc(100% - 32px), var(--max)); margin-inline: auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner { min-height: 64px; display: flex; align-items: center; gap: 10px; padding-block: 10px; }
+    .radar-label { min-width: 0; font-weight: 760; letter-spacing: -.02em; }
+    .radar-label span { display: block; color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: .02em; }
+    .status-cluster { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-pill, .chip, .filter {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      min-height: 36px; border: 1px solid var(--line); border-radius: 999px;
+      padding: 7px 11px; background: var(--surface); color: var(--text); font-size: 12px; font-weight: 720;
+    }
+    .status-pill.gold { color: var(--gold-strong); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); background: var(--gold-soft); }
+    .page-nav { display: flex; gap: 6px; margin-left: 10px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+    .page-tab { min-height: 34px; padding: 6px 12px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 780; cursor: pointer; }
+    .page-tab[aria-current="page"] { background: var(--gold); color: #111008; }
+    .landing { padding: 56px 0 36px; }
+    .landing-lead { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 28px; align-items: end; padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+    .landing h1, .directory-hero h1 { margin: 0; font: 820 clamp(40px, 7vw, 76px)/.95 Georgia, "Times New Roman", serif; letter-spacing: -.055em; }
+    .landing-copy { color: var(--muted); font-size: clamp(17px, 2vw, 20px); }
+    .landing-copy p { margin: 0 0 18px; }
+    .landing-copy strong { color: var(--text); }
+    .route-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+    .route-card { min-height: 220px; display: flex; flex-direction: column; align-items: flex-start; padding: 24px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); text-align: left; color: var(--text); }
+    button.route-card { width: 100%; cursor: pointer; }
+    .route-number { color: var(--gold-strong); font: 800 34px/1 Georgia, serif; }
+    .route-card h2 { margin: auto 0 8px; font: 760 25px/1.05 Georgia, serif; }
+    .route-card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .route-arrow { margin-top: 18px; color: var(--gold-strong); font-weight: 850; }
+    .directory-hero { padding: 48px 0 22px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); gap: 24px; align-items: end; }
+    .directory-hero p { margin: 16px 0 0; color: var(--muted); font-size: 18px; }
+    .directory-summary { padding: 20px; border: 1px solid color-mix(in srgb, var(--gold) 48%, var(--line)); border-radius: var(--radius-md); background: var(--gold-soft); }
+    .directory-summary strong { display: block; font: 800 30px/1 Georgia, serif; color: var(--gold-strong); }
+    .directory-summary span { display: block; margin-top: 8px; color: var(--text); font-size: 13px; font-weight: 700; }
+    .directory-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-bottom: 20px; }
+    .directory-card { display: flex; min-width: 0; flex-direction: column; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+    .directory-market { color: var(--muted); font-size: 11px; font-weight: 820; letter-spacing: .08em; text-transform: uppercase; }
+    .directory-station { display: flex; gap: 12px; align-items: baseline; margin-top: 10px; }
+    .directory-frequency { color: var(--gold-strong); font: 820 28px/1 Georgia, serif; letter-spacing: -.04em; }
+    .directory-card h3 { margin: 0; font-size: 19px; }
+    .directory-format { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+    .directory-card .station-actions { margin-top: auto; padding-top: 16px; }
+    .hero { padding: 44px 0 24px; display: grid; gap: 24px; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); align-items: end; }
+    .hero h1 { margin: 0; max-width: 760px; font: 820 clamp(38px, 7vw, 72px)/.96 Georgia, "Times New Roman", serif; letter-spacing: -.055em; }
+    .hero p { margin: 18px 0 0; max-width: 690px; color: var(--muted); font-size: clamp(16px, 2vw, 19px); }
+    .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .hero-stat { min-height: 116px; padding: 18px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .hero-stat strong { display: block; font: 800 30px/1 Georgia, serif; color: var(--gold-strong); }
+    .hero-stat span { display: block; margin-top: 9px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .filter-dock { padding: 16px 0 20px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter { min-height: 44px; padding-inline: 16px; cursor: pointer; transition: background .18s ease, color .18s ease, border-color .18s ease; }
+    .filter[aria-pressed="true"] { background: var(--gold); color: #111008; border-color: var(--gold); }
+    .result-line { margin: 12px 2px 0; color: var(--muted); font-size: 13px; }
+    .section { padding: 28px 0; }
+    .section-heading { display: flex; align-items: end; gap: 20px; justify-content: space-between; margin-bottom: 16px; }
+    .section-heading h2 { margin: 0; font: 780 clamp(26px, 4vw, 40px)/1 Georgia, serif; letter-spacing: -.035em; }
+    .section-heading p { margin: 0; color: var(--muted); max-width: 620px; }
+    .plan-board { display: grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
+    .plan-primary, .scam-shield { padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+    .plan-primary { border-color: color-mix(in srgb, var(--gold) 52%, var(--line)); }
+    .eyebrow { margin: 0 0 8px; color: var(--gold-strong); font-size: 12px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .plan-primary h3, .scam-shield h3 { margin: 0; font: 760 24px/1.1 Georgia, serif; }
+    .plan-list { margin: 18px 0 0; padding: 0; list-style: none; counter-reset: plan; display: grid; gap: 12px; }
+    .plan-list li { counter-increment: plan; display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 12px; align-items: start; }
+    .plan-list li::before { content: counter(plan); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--gold-soft); color: var(--gold-strong); font-weight: 850; }
+    .plan-list strong { display: block; }
+    .plan-list span { color: var(--muted); font-size: 14px; }
+    .scam-shield { background: var(--warning-soft); border-color: color-mix(in srgb, var(--warning) 38%, var(--line)); }
+    .shield-line { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; color: var(--warning); }
+    .shield-mark { flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-weight: 900; }
+    .scam-shield p { margin: 12px 0 0; color: var(--text); }
+    .urgent-strip { display: grid; gap: 10px; }
+    .urgent-item { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+    .urgent-date { color: var(--warning); font-weight: 850; font-size: 13px; }
+    .urgent-item strong { display: block; }
+    .urgent-item span { color: var(--muted); font-size: 13px; }
+    .action-link, .contact-link {
+      display: inline-flex; align-items: center; justify-content: center; min-height: 44px;
+      border-radius: 999px; padding: 9px 14px; border: 1px solid var(--line); text-decoration: none;
+      background: var(--surface); color: var(--text); font-size: 13px; font-weight: 780;
+    }
+    .action-link.primary { background: var(--gold); border-color: var(--gold); color: #111008; }
+    .market-list { display: grid; gap: 12px; }
+    details.market { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); overflow: clip; }
+    details.market > summary { list-style: none; cursor: pointer; min-height: 76px; display: flex; align-items: center; gap: 14px; padding: 18px 20px; }
+    details.market > summary::-webkit-details-marker { display: none; }
+    .market-name { font: 760 24px/1 Georgia, serif; }
+    .market-meta { color: var(--muted); font-size: 13px; }
+    .market-chevron { margin-left: auto; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; transition: transform .18s ease; }
+    details[open] .market-chevron { transform: rotate(180deg); }
+    .market-body { padding: 0 12px 12px; display: grid; gap: 12px; }
+    .station-card { border-radius: var(--radius-md); background: var(--surface-2); border: 1px solid var(--line); padding: 18px; }
+    .station-top { display: grid; grid-template-columns: 124px minmax(0,1fr); gap: 18px; align-items: start; }
+    .frequency { font: 820 clamp(38px, 7vw, 58px)/.9 Georgia, serif; letter-spacing: -.055em; color: var(--gold-strong); overflow-wrap: anywhere; }
+    .station-name h3 { margin: 0; font-size: 20px; line-height: 1.15; }
+    .station-name p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .station-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip { min-height: 28px; padding: 4px 9px; font-size: 11px; background: transparent; }
+    .chip.black { color: var(--gold-strong); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+    .station-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .contact-link { background: var(--surface); }
+    .station-note { margin: 14px 0 0; padding: 12px 14px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--surface) 65%, transparent); color: var(--muted); font-size: 13px; }
+    .contest-list { margin-top: 18px; display: grid; gap: 10px; }
+    .contest { padding: 15px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--line); }
+    .contest-head { display: flex; gap: 12px; align-items: start; justify-content: space-between; }
+    .contest h4 { margin: 0; font-size: 16px; line-height: 1.25; }
+    .confidence { flex: 0 0 auto; border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 850; letter-spacing: .03em; text-transform: uppercase; }
+    .confidence.verified { color: var(--good); background: var(--good-soft); }
+    .confidence.listed { color: var(--gold-strong); background: var(--gold-soft); }
+    .confidence.unverified { color: var(--warning); background: var(--warning-soft); }
+    .contest-desc { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+    .contest-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .meta-tag { border-radius: 999px; background: var(--surface-2); padding: 5px 8px; font-size: 11px; font-weight: 720; }
+    .contest-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .source-link { color: var(--gold-strong); font-size: 12px; font-weight: 800; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .verified-date { color: var(--muted); font-size: 11px; }
+    .empty-state { margin-top: 16px; padding: 18px; border: 1px dashed var(--line); border-radius: var(--radius-sm); color: var(--muted); font-size: 14px; }
+    .rules-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .rule-card { padding: 22px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+    .rule-card h3 { margin: 0; font: 750 20px/1.1 Georgia, serif; }
+    .rule-card ul { margin: 14px 0 0; padding-left: 19px; color: var(--muted); font-size: 14px; }
+    .rule-card li + li { margin-top: 8px; }
+    .protocol { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .protocol-card { padding: 22px; border-radius: var(--radius-md); background: var(--surface); border: 1px solid var(--line); }
+    .protocol-card h3 { margin: 0 0 12px; font: 750 20px/1.1 Georgia, serif; }
+    .protocol-card p { color: var(--muted); margin: 0; }
+    footer { padding: 36px 0 calc(36px + env(safe-area-inset-bottom)); color: var(--muted); font-size: 13px; }
+    .hidden { display: none !important; }
+    .no-results { padding: 34px 22px; border-radius: var(--radius-lg); background: var(--surface); border: 1px dashed var(--line); text-align: center; color: var(--muted); }
+    @media (max-width: 960px) {
+      .topbar-inner { flex-wrap: wrap; }
+      .page-nav { order: 3; width: 100%; margin-left: 0; }
+      .page-tab { flex: 1; }
+      .directory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 820px) {
+      .hero, .plan-board, .protocol, .landing-lead, .directory-hero { grid-template-columns: 1fr; }
+      .hero { padding-top: 30px; }
+      .route-grid, .rules-grid { grid-template-columns: 1fr; }
+      .route-card { min-height: 170px; }
+      .section-heading { display: block; }
+      .section-heading p { margin-top: 8px; }
+    }
+    @media (max-width: 560px) {
+      .wrap { width: min(calc(100% - 22px), var(--max)); }
+      .topbar-inner { align-items: flex-start; }
+      .status-cluster .status-pill:first-child { display: none; }
+      .radar-label { width: 58%; }
+      .page-nav { overflow: hidden; }
+      .page-tab { padding-inline: 7px; font-size: 11px; }
+      .landing { padding-top: 34px; }
+      .landing h1, .directory-hero h1 { font-size: 43px; }
+      .directory-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 42px; }
+      .hero-stats { grid-template-columns: 1fr 1fr; }
+      .hero-stat:last-child { grid-column: 1 / -1; min-height: 84px; }
+      .urgent-item { grid-template-columns: 1fr auto; }
+      .urgent-date { grid-column: 1 / -1; }
+      .station-top { grid-template-columns: 1fr; gap: 10px; }
+      .frequency { font-size: 46px; }
+      .station-card { padding: 14px; }
+      .contest-head { display: block; }
+      .confidence { display: inline-flex; margin-top: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+
+    /* Regional Scout system — high-contrast signal, shared with the hub. */
+    :root {
+      --bg: #f2f3ed;
+      --surface: #ffffff;
+      --surface-2: #e7e9df;
+      --text: #10110f;
+      --muted: #5b5d55;
+      --line: #c7cabd;
+      --gold: #b7ed00;
+      --gold-strong: #354500;
+      --gold-soft: #dfff73;
+      --warning: #b52b20;
+      --warning-soft: #ffe3de;
+      --good: #12613d;
+      --good-soft: #d8f5e5;
+      --shadow: 0 12px 0 rgba(16, 17, 15, .09);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 7px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #090a08;
+        --surface: #141512;
+        --surface-2: #20221c;
+        --text: #f5f6ee;
+        --muted: #b9bcaf;
+        --line: #3b3e34;
+        --gold: #c8ff00;
+        --gold-strong: #c8ff00;
+        --gold-soft: #293500;
+        --warning: #ff8678;
+        --warning-soft: #351a17;
+        --good: #72e6a9;
+        --good-soft: #123123;
+        --shadow: 0 12px 0 rgba(200, 255, 0, .10);
+      }
+    }
+    body {
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(135deg, color-mix(in srgb, var(--gold) 6%, transparent) 25%, transparent 25%),
+        linear-gradient(315deg, color-mix(in srgb, var(--gold) 5%, transparent) 25%, transparent 25%);
+      background-position: 0 0, 28px 28px;
+      background-size: 56px 56px;
+      font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    }
+    .topbar {
+      border-bottom: 4px solid var(--gold);
+      background: #090a08;
+      color: #f7f8f1;
+      backdrop-filter: none;
+    }
+    .topbar-inner { min-height: 72px; }
+    .radar-label { font-weight: 700; letter-spacing: -.025em; }
+    .radar-label span { color: #bfc2b6; }
+    .status-pill, .page-nav { border-color: #3a3d34; background: #171815; color: #f7f8f1; }
+    .status-pill.gold { border-color: var(--gold); background: var(--gold); color: #0b0c08; }
+    .page-tab { color: #c6c8bf; }
+    .page-tab:hover { color: #fff; }
+    .page-tab[aria-current="page"] { background: var(--gold); color: #0b0c08; }
+    .landing { padding-top: 64px; }
+    .landing-lead { position: relative; padding: 32px; border: 2px solid var(--text); background: var(--surface); box-shadow: 10px 10px 0 var(--gold); }
+    .landing-lead::after { content: "GA"; position: absolute; right: 24px; top: -32px; color: var(--gold); font: 400 82px/1 Anton, Impact, sans-serif; opacity: .18; pointer-events: none; }
+    .landing h1, .directory-hero h1, .hero h1 {
+      font-family: Anton, Impact, Haettenschweiler, sans-serif;
+      font-weight: 400;
+      letter-spacing: -.02em;
+      text-transform: uppercase;
+    }
+    .landing h1 { max-width: 760px; font-size: clamp(54px, 8.4vw, 108px); line-height: .9; }
+    .landing-copy { color: var(--muted); font-weight: 500; }
+    .eyebrow { color: var(--gold-strong); font-weight: 700; letter-spacing: .12em; }
+    .route-grid { gap: 16px; margin-top: 30px; }
+    .route-card { position: relative; min-height: 245px; border: 2px solid var(--text); border-radius: var(--radius-lg); box-shadow: 8px 8px 0 var(--text); transition: transform .16s ease, box-shadow .16s ease; overflow: hidden; }
+    .route-card:nth-child(1), .route-card:nth-child(3) { background: #10110f; color: #f8f9f2; }
+    .route-card:nth-child(2) { background: var(--gold); color: #0b0c08; }
+    .route-card:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--text); }
+    .route-card:active { transform: translate(4px, 4px); box-shadow: 3px 3px 0 var(--text); }
+    .route-number { color: var(--gold); font: 400 48px/1 Anton, Impact, sans-serif; }
+    .route-card:nth-child(2) .route-number, .route-card:nth-child(2) .route-arrow { color: #0b0c08; }
+    .route-card h2 { font: 400 32px/.98 Anton, Impact, sans-serif; letter-spacing: .01em; text-transform: uppercase; }
+    .route-card p { color: #c4c6bc; }
+    .route-card:nth-child(2) p { color: #283100; }
+    .route-arrow { color: var(--gold); letter-spacing: .02em; }
+    .hero, .directory-hero { margin-top: 34px; padding: 34px; border: 2px solid var(--text); background: var(--surface); box-shadow: 10px 10px 0 var(--gold); }
+    .hero h1, .directory-hero h1 { font-size: clamp(48px, 7vw, 88px); line-height: .92; }
+    .hero-stat, .directory-summary { border: 2px solid var(--text); box-shadow: 5px 5px 0 var(--gold); }
+    .hero-stat strong, .directory-summary strong, .directory-frequency, .frequency { font-family: Anton, Impact, sans-serif; font-weight: 400; letter-spacing: 0; }
+    .filters { gap: 10px; }
+    .filter { border-width: 2px; border-color: var(--text); border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .035em; box-shadow: 3px 3px 0 var(--text); }
+    .filter:hover { background: var(--surface-2); }
+    .filter:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--text); }
+    .filter[aria-pressed="true"] { color: #0b0c08; box-shadow: 3px 3px 0 var(--text); }
+    .section-heading h2 { font: 400 clamp(34px, 5vw, 52px)/.95 Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: .005em; }
+    .plan-primary, .scam-shield, details.market, .rule-card, .protocol-card, .directory-card, .urgent-item { border-width: 2px; }
+    .plan-primary, details.market, .directory-card { box-shadow: 6px 6px 0 color-mix(in srgb, var(--gold) 70%, var(--text)); }
+    .plan-primary h3, .scam-shield h3, .rule-card h3, .protocol-card h3, .market-name { font-family: Anton, Impact, sans-serif; font-weight: 400; letter-spacing: .01em; text-transform: uppercase; }
+    .market-chevron { border: 2px solid var(--line); background: var(--surface-2); }
+    .action-link, .contact-link { border-width: 2px; border-color: var(--text); border-radius: 4px; font-weight: 700; box-shadow: 2px 2px 0 var(--text); }
+    .action-link:hover, .contact-link:hover { background: var(--gold); color: #0b0c08; }
+    .action-link:active, .contact-link:active { transform: translate(1px, 1px); box-shadow: none; }
+    .contest, .station-card { border-width: 2px; }
+    .confidence, .meta-tag, .chip { border-radius: 3px; }
+    footer { border-top: 4px solid var(--gold); margin-top: 30px; }
+    @media (max-width: 820px) {
+      .landing-lead, .hero, .directory-hero { padding: 24px; }
+      .landing h1 { font-size: clamp(52px, 16vw, 76px); }
+      .route-card { min-height: 190px; }
+    }
+    @media (max-width: 560px) {
+      .topbar-inner { padding-block: 12px; }
+      .radar-label { width: calc(100% - 122px); }
+      .status-cluster { max-width: 112px; }
+      .status-pill { padding-inline: 9px; }
+      .page-nav { border-radius: 8px; border-width: 2px; padding: 4px; }
+      .page-tab { min-height: 42px; border-radius: 4px; }
+      .landing { padding-top: 38px; }
+      .landing-lead { padding: 22px 18px; box-shadow: 6px 6px 0 var(--gold); }
+      .landing-lead::after { font-size: 58px; right: 16px; top: -22px; }
+      .landing h1, .hero h1, .directory-hero h1 { font-size: 52px; line-height: .92; }
+      .hero, .directory-hero { margin-top: 20px; padding: 22px 18px; box-shadow: 6px 6px 0 var(--gold); }
+      .route-card { padding: 20px; box-shadow: 5px 5px 0 var(--text); }
+      .route-card:hover { transform: none; box-shadow: 5px 5px 0 var(--text); }
+      .filter { flex: 1 1 calc(50% - 10px); padding-inline: 10px; }
+      .station-actions .contact-link { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="radar-label">Georgia radio guide<span>7 researched markets · Verified Nov 16, 2026</span></div>
+      <nav class="page-nav" aria-label="Guide pages">
+        <button class="page-tab" type="button" data-page-target="landing" aria-current="page">Start</button>
+        <button class="page-tab" type="button" data-page-target="scout">Contest Scout</button>
+        <button class="page-tab" type="button" data-page-target="directory">Radio Directory</button>
+      </nav>
+      <div class="status-cluster">
+        <span class="status-pill">Verified · Nov 16, 2026</span>
+        <span class="status-pill gold"><span id="top-count">69</span> records · Nov 16 scout</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap landing page-view" data-page="landing">
+      <div class="landing-lead">
+        <div>
+          <p class="eyebrow">Georgia radio · built for action</p>
+          <h1>Find your sound. Find the win.</h1>
+        </div>
+        <div class="landing-copy">
+          <p>One place to move between Georgia’s radio landscape and the contests verified on Nov 16, 2026. Anything flagged unverified was not confirmed this week — re-check the official page before entering.</p>
+          <p><strong>Start by station, format, or prize.</strong> Every listing points back to the same researched station record, checked Nov 16, 2026.</p>
+        </div>
+      </div>
+      <div class="route-grid" aria-label="Choose a route">
+        <button class="route-card" type="button" data-page-target="scout">
+          <span class="route-number">01</span>
+          <h2>Contest Scout</h2>
+          <p>See the 69 contest records from the Nov 16, 2026 scout — verified, listed and clearly-flagged unverified.</p>
+          <span class="route-arrow">Open the scout →</span>
+        </button>
+        <button class="route-card" type="button" data-page-target="directory">
+          <span class="route-number">02</span>
+          <h2>Radio Directory</h2>
+          <p>Browse 24 Georgia stations by Black Radio, Hip-Hop & R&amp;B, Urban AC, country, pop, rock and talk.</p>
+          <span class="route-arrow">Browse stations →</span>
+        </button>
+        <button class="route-card" type="button" data-page-target="scout" data-scroll-target="rules">
+          <span class="route-number">03</span>
+          <h2>Rules Decoder</h2>
+          <p>Protect eligibility across station groups before a win triggers a 30-day, 60-day or one-year lockout.</p>
+          <span class="route-arrow">Read the rules →</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="page-view hidden" data-page="scout">
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow">Georgia · radio contest intelligence · verified Nov 16, 2026</p>
+        <h1>Seven markets. Verified Nov 16.</h1>
+        <p>Weekly scout verified Monday, Nov 16, 2026. Contests confirmed ended — including the iHeart Q4 $1,000 sweepstakes (ended Nov 13), Haunted Cash (ended Oct 31) and WSB’s A Grand for Groceries — have been removed from the active lists. Where a station page would not load or rendered empty, its contests are shown as “unverified this week” rather than removed. Always re-check the official page before entering.</p>
+      </div>
+      <div class="hero-stats" aria-label="Scout summary">
+        <div class="hero-stat"><strong>Nov 16</strong><span>2026 verified date</span></div>
+        <div class="hero-stat"><strong>69</strong><span>contest records this week</span></div>
+        <div class="hero-stat"><strong>24</strong><span>stations across 7 markets</span></div>
+      </div>
+    </section>
+
+    <section class="wrap filter-dock" aria-label="Contest filters">
+      <div class="filters" id="filters">
+        <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter" type="button" data-filter="black" aria-pressed="false">Black Radio</button>
+        <button class="filter" type="button" data-filter="mainstream" aria-pressed="false">Mainstream</button>
+        <button class="filter" type="button" data-filter="cash" aria-pressed="false">Cash</button>
+        <button class="filter" type="button" data-filter="tickets" aria-pressed="false">Tickets</button>
+        <button class="filter" type="button" data-filter="online" aria-pressed="false">Enter Online</button>
+      </div>
+      <p class="result-line" id="result-line" aria-live="polite">Showing 24 stations and 69 contest records · verified Nov 16, 2026.</p>
+    </section>
+
+    <section class="wrap section" aria-labelledby="plan-heading">
+      <div class="section-heading">
+        <h2 id="plan-heading">This week’s attack plan</h2>
+        <p>Windows closing between Nov 18 and Nov 27 come first, then the fully-verified WSRV weekday call-ins running Nov 16–20.</p>
+      </div>
+      <div class="plan-board">
+        <article class="plan-primary">
+          <p class="eyebrow">Verified Nov 16, 2026 · act in this order</p>
+          <h3>Closest deadlines first.</h3>
+          <ol class="plan-list">
+            <li><div><strong>Wed Nov 18 — Hot 107.9 GREAT Grocery Giveaway.</strong><span>$100 Kroger gift cards to the first 100 listeners at a secret Kroger; the location is announced on the Morning Hustle at 9 AM Nov 18. Also this week: WSRV’s Megadeth and Fantasy in Lights call-ins run weekdays Nov 16–20 at 404-738-9797.</span></div></li>
+            <li><div><strong>Sat Nov 21 — B98.5 Stuff the Truck, 9 AM–3 PM.</strong><span>Publix Alpharetta Commons (4305 State Bridge Rd). The first 25 people dropping off a frozen turkey get 2 Trans-Siberian Orchestra tickets (ARV $100, GA 18+). Then Mon Nov 23: the Kicks 99 Holiday Party Prep winner is selected ($200 Amazon Gift Card — enter via the newsletter email link).</span></div></li>
+            <li><div><strong>Fri Nov 27 — Radio One Atlanta Money Drop ENDS.</strong><span>Hot 107.9 + Majic 107.5, verified by the rules PDF (Feb 16–Nov 27, 2026). Enter once per promo period; the nominee calls 404-741-1079 or 404-741-1075. Prize is $500 or $1,000 per the rules — it never exceeds $1,000.</span></div></li>
+            <li><div><strong>Play WSRV’s jackpot game at 8 AM, 1 PM and 4 PM.</strong><span>Up the River, Down the River: caller 25 at 404-738-9797 guesses the exact jackpot (1 guess/person/day). Jackpot #4 is live — Nov 16 clues: 8 AM $7,742 DOWN · 1 PM $7,735 DOWN · 4 PM $7,731 UP. Remember the CMG household 30-day rule before any CMG win.</span></div></li>
+          </ol>
+        </article>
+        <aside class="scam-shield">
+          <div class="shield-line"><span class="shield-mark">!</span><h3>Scam shield</h3></div>
+          <p><strong>Real contests NEVER ask for payment, card data or a PIN.</strong> Check that the page belongs to the Georgia station. The stale star941fm.iheart.com and v103.iheart.com domains redirect to San Diego stations, not Atlanta.</p>
+          <p><strong>Wrong-station traps:</strong> b985radio.com is a New Jersey station and b985.fm is Maine — neither is Atlanta’s B98.5. star941fm.iheart.com is San Diego, not Atlanta’s Star 94.1.</p>
+          <p><strong>offerscontest.com is NOT official.</strong> It is circulating a “WSB-TV Gas/Grocery giveaway” page as a third-party aggregator. Real WSB-TV contests are on wsbtv.com only.</p>
+          <p>Use only station promotion pages, station apps and official rules linked in this scout.</p>
+          <p><strong>Radio One never charges for airplay.</strong> Scammers clone station or personality pages, steal logos and photos, then DM artists asking for payment through an app. This warning applies to Hot 107.9 and Majic 107.5.</p>
+          <p>The unofficial “Iheart 1000 Contest” PDF on quantumcourse.iitr.ac.in is still circulating, and a copy now sits at virtual.cteg.edu.py. Do not download or trust either. Aggregator details on freebiemom.com are NOT official — the same goes for contestreminder, sweepsadvantage and sweepstakesfanatics — and never provide card details to enter an iHeart sweepstakes.</p>
+          <p>Standing caution: a WJIZ-branded redirect through clementine-anma.xyz was reported before Oct 19. Enter only through official iheart.com or station pages.</p>
+          <p>A sites.google.com page promising a $750–$1,000 Cash App win surfaced in Haunted Cash searches — it is not a station page; do not enter. Standing warning: enter Haunted Cash only on official station domains. A news-usa.today article about an Albany iHeart giveaway is not an official iHeart page.</p>
+          <p><strong>Augusta trap:</strong> hot977.com is a PARKED GoDaddy domain for sale ($7,999) — it is NOT Hot 97.7 Augusta’s site (the real site is hotaugusta.com). Any contest contact from hot977.com is suspect. hot97.com is New York’s HOT 97, not Augusta.</p><p><strong>iHeart Q4 $1,000 is OVER:</strong> the iHeartRadio 2026 Q4 Cash Sweepstakes ended Fri Nov 13, 2026 at 9:54:59 PM ET. No successor iHeart cash-keyword contest was found Nov 16 — anyone still collecting “hourly keywords” for it is not running a live contest. The fake PDFs on quantumcourse.iitr.ac.in and virtual.cteg.edu.py were not seen circulating this week, but the warning stands. freebiemom.com is a non-official aggregator (its Give Thanks &amp; Win and Q4 Cash pages were updated Nov 15–16) — enter only through official station pages or the iHeartRadio app. offerscontest.com is also a non-official aggregator, not a scam.</p><p><strong>Cash App fake — standing warning:</strong> the old “Cash App 750” sites.google.com page still exists in the search index (last crawl ~293 days ago) and did NOT re-surface as a new item this week. Real giveaways never ask for payment, passwords, or sign-in codes.</p><p><strong>Context, not scams:</strong> some CMG and Hot 107.9 contest links mis-route to privacy or agency pages. Haunted Cash is an official SoCast Digital network-wide partner promotion; its entry form is hosted by SoCast, not the station.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="wrap section" id="markets" aria-labelledby="market-heading">
+      <div class="section-heading">
+        <h2 id="market-heading">Market radar</h2>
+        <p>Open a market, then tap a station line or official source. “Listed” means the station published the promotion but the full mechanics were not confirmed.</p>
+      </div>
+      <div class="market-list" id="market-list"></div>
+      <div class="no-results hidden" id="no-results">No station in this snapshot matches that filter.</div>
+    </section>
+
+    <section class="wrap section" id="rules" aria-labelledby="rules-heading">
+      <div class="section-heading"><h2 id="rules-heading">Win rules decoder</h2><p>Winning on one station can make your household ineligible across a whole cluster.</p></div>
+      <div class="rules-grid">
+        <article class="rule-card"><p class="eyebrow">Cox Media Group · Atlanta</p><h3>30 days across five stations</h3><ul><li>Normally 18+ Georgia residents; valid Georgia ID, or government ID plus a recent utility bill.</li><li>One winner per household across WSB-AM, WSB-FM, WSBB, WALR and WSRV every 30 days. Roommates count.</li><li>A $600+ prize locks the household out of any CMG Atlanta prize for one year.</li><li>Website/app default: normally one entry per person per day since Sept 22, 2025. Call entries must be placed personally; autodialers are prohibited.</li><li>Pickup: 1601 W. Peachtree St. NE, Atlanta, weekdays 8:30 AM–5:30 PM, excluding holidays. Front desk: 404-897-7500.</li><li>Reconfirmed Nov 16, 2026: prize-claim emails come from &lt;station&gt;@vprizecloset.com; questions go to AtlantaRadioPrizes@CMG.com. No CMG $1K cash-keyword sweep is currently running — “A Grand for Groceries” ended Oct 9, 2026, and there is no 8a/10a/12p/2p/5p keyword contest on any CMG Atlanta station this week.</li><li>Cash timing conflict: FAQ says paperwork within 30 days and checks within 12 weeks; main rules say checks within 4–6 weeks.</li></ul></article>
+        <article class="rule-card"><p class="eyebrow">Urban One · Atlanta</p><h3>30-day cross-station lock</h3><ul><li>Normally 18+ legal U.S. residents in the station’s metropolitan area.</li><li>One person, family or household win within 30 days across WHTA, WAMJ, WPZE and WAMJ-HD2.</li><li>Default online limit: one entry per person and email per promotion unless specific rules differ.</li><li>Government photo ID and W-9 required. Prizes over $600 get a 1099; winner pays taxes.</li></ul><p><a class="source-link" target="_blank" rel="noopener" href="https://hotspotatl.com/4506139/radio-one-general-promotional-rules/">Official general rules</a></p></article>
+        <article class="rule-card"><p class="eyebrow">Beasley · Augusta</p><h3>60 days between wins</h3><ul><li>18+ in the listed Georgia or South Carolina counties; valid ID and proof of residency.</li><li>One win every 60 days; prize worth $600+ only once every six months; one winner per household.</li><li>Pickup: 4051 Jimmie Dyess Parkway, Augusta, Monday–Friday 9 AM–5 PM, excluding holidays.</li></ul><p><a class="source-link" target="_blank" rel="noopener" href="https://hotaugusta.com/uploads/2018/12/General-Contest-Rules-December-2018-HOT.pdf">Official HOT rules PDF</a></p></article>
+        <article class="rule-card"><p class="eyebrow">iHeartMedia</p><h3>Three wins per 30 days maximum</h3><ul><li>National sweepstakes: once every 15 days. Local sweepstakes: once every 7 days per station. One winner per household.</li><li>Maximum three local + national wins per 30 days. A major prize valued $100+ is once per 30 days across iHeart contests.</li><li>Local contests require listening-area residency and age 18+.</li><li>Savannah pickup: Mon/Wed/Fri 9 AM–2 PM at 245 Alfred Street; claim within 10 business days.</li><li>Albany pickup: Mon–Fri 9 AM–5 PM at 809 S Westover Blvd.; ZIP differs by station listing.</li></ul><p><a class="source-link" target="_blank" rel="noopener" href="https://i.iheart.com/v3/re/new_assets/63d42b8b5f8355b7c228490f?passthrough=1">Official iHeart rules asset</a></p></article>
+        <article class="rule-card"><p class="eyebrow">Cumulus · Macon</p><h3>30 days between wins</h3><ul><li>18+ legal U.S. residents; one win per household per contest.</li><li>One contest win per 30 days across Cumulus contests; claim prizes within 7 days.</li><li>Proof of identity and residence may be required. Pickup details were not verified.</li></ul><p><a class="source-link" target="_blank" rel="noopener" href="https://www.macon923.com/2024/11/23/99-wden-contest-rules/">Official Macon rules</a></p></article>
+        <article class="rule-card"><p class="eyebrow">Cumulus · Savannah</p><h3>Read each contest’s rules</h3><ul><li>National promotions use the station’s per-contest National Contest Rules Archive.</li><li>Fall Fund permits one daily entry, resetting at midnight ET, plus extra engagement entries.</li><li>A different Cumulus market’s local template suggests a 100-mile radius and 30/90-day cooldowns, but those terms were not confirmed for Savannah.</li></ul><p><a class="source-link" target="_blank" rel="noopener" href="https://www.i95savannah.com/national-contest-rules-archive">Official rules archive</a></p></article>
+      </div>
+    </section>
+
+    <section class="wrap section" aria-labelledby="protocol-heading">
+      <div class="section-heading"><h2 id="protocol-heading">Scout protocol</h2><p>How each listing earned its confidence label.</p></div>
+      <div class="protocol">
+        <article class="protocol-card"><h3>Source ladder</h3><p>Station promotions, contest and contact pages come first, followed by official owner rules. Search-discovered details stay labeled. The weekly re-scout was finalized Monday, Nov 16, 2026. Contests confirmed ended were removed from the active lists; where a station page would not load or rendered empty, its contests are carried as “unverified this week” instead of being removed. Every contest record carries its source page when one was supplied.</p></article>
+        <article class="protocol-card"><h3>Status language</h3><p>All labels are Nov 16 labels. <strong>Verified</strong> means the official page confirmed the contest or mechanics on Nov 16, 2026. <strong>Listed</strong> means the station showed it but the full mechanics were not confirmed. <strong>Unverified</strong> means the source could not establish that it was currently active this week — unverified details are shown as unverified, never as fact.</p></article>
+        <article class="protocol-card"><h3>Entry checklist</h3><p>Check the prize, how to enter, keyword or call number, eligibility, entry limit, end date and official rules before every entry. No automated dialing or automated entry.</p></article>
+        <article class="protocol-card"><h3>Known gaps</h3><p>Nov 16, 2026: WSRV 97.1 was fully verified via its contests index (phone 404-738-9797 confirmed). wsbradio.com, audacy.com (V-103, Star 94.1), majicatl.com and WNGC’s official site would not load, and the B98.5, WQBT, WAEV, WDEN, WPEZ and WMGB pages rendered empty or stale — those stations’ contests are flagged unverified this week rather than removed. WCGQ Columbus has no contest page, and its registry frequency (99.5) conflicts with Wikipedia (107.3 FM) — flagged in its station record, not changed. Sunny 102.7 / WZNY is confirmed defunct.</p></article>
+      </div>
+    </section>
+    </div>
+
+    <section class="page-view hidden" data-page="directory" aria-labelledby="directory-heading">
+      <div class="wrap directory-hero">
+        <div>
+          <p class="eyebrow">Station directory · seven Georgia markets</p>
+          <h1 id="directory-heading">Tune by sound, not guesswork.</h1>
+          <p>Browse the same 24 researched stations by format, with direct call, text, contest and rules links wherever they were verified.</p>
+        </div>
+        <div class="directory-summary"><strong id="directory-count">24</strong><span id="directory-count-label">stations across 7 markets</span></div>
+      </div>
+      <div class="wrap filter-dock" aria-label="Directory filters">
+        <div class="filters" id="directory-filters">
+          <button class="filter" type="button" data-dir-filter="all" aria-pressed="true">All formats</button>
+          <button class="filter" type="button" data-dir-filter="black" aria-pressed="false">Black Radio</button>
+          <button class="filter" type="button" data-dir-filter="hiphop" aria-pressed="false">Hip-Hop &amp; R&amp;B</button>
+          <button class="filter" type="button" data-dir-filter="urbanac" aria-pressed="false">Urban AC</button>
+          <button class="filter" type="button" data-dir-filter="pop" aria-pressed="false">Pop</button>
+          <button class="filter" type="button" data-dir-filter="country" aria-pressed="false">Country</button>
+          <button class="filter" type="button" data-dir-filter="rock" aria-pressed="false">Rock &amp; Classic Hits</button>
+          <button class="filter" type="button" data-dir-filter="talk" aria-pressed="false">News &amp; Talk</button>
+        </div>
+        <p class="result-line" id="directory-result" aria-live="polite">Showing all 24 stations.</p>
+      </div>
+      <div class="wrap directory-grid" id="directory-grid"></div>
+      <div class="wrap no-results hidden" id="directory-empty">No station in this snapshot matches that format.</div>
+    </section>
+  </main>
+
+  <footer class="wrap">Built by Muse for Kimani Dudley · Weekly scout verified Nov 16, 2026 · 69 contest records across 24 stations · Private build. This is a dated research snapshot; re-check the official page before entering.</footer>
+
+  <script>
+    // === WEEKLY SCOUT UPDATE BLOCK: edit only this STATIONS array to refresh listings. ===
+    const STATIONS = [
+      {market:"Atlanta", lane:"black", call:"+14048681041", callLabel:"1-404-868-1041", frequency:"104.1", name:"KISS", format:"Urban AC · Atlanta’s Best R&B", owner:"Cox Media Group", contestsUrl:"https://cmg-cmg-rd-20020-prod.cdn.arcpublishing.com/contests/", note:"Studio phone 1-404-868-1041 carried from baseline, not re-verified Nov 16. Pickup: 1601 W. Peachtree St. NE, Atlanta, GA 30309 · weekdays 8:30 AM–5:30 PM, excluding holidays. CMG household 30-day rule applies.", contests:[
+        {name:"Sweat Fest — win a trip for two to Punta Cana!", status:"verified", tags:["tickets","online"], desc:"STILL LIVE — verified in the live promo feed Nov 16. ARV $12,500. Age 21+. Prize: trip for winner + guest, who are brought onstage for a Keith Sweat performance. Baseline dates Oct 19, 2026–Jun 27, 2027 were NOT re-confirmed this week — shown as baseline only. Date conflict on the station page itself (body prints Sep 2–6, 2026; prize details print Sep 2–6, 2027) remains unresolved; check the official rules before planning around either.", end:"Jun 27, 2027 (baseline, not re-confirmed)", source:"https://cmg-cmg-rd-20020-prod.cdn.arcpublishing.com/contests/"},
+        {name:"Waiting to Exhale via Ramona", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — not re-confirmed on the official page; not marked ended.", source:"https://cmg-cmg-rd-20020-prod.cdn.arcpublishing.com/contests/"},
+        {name:"Hezekiah Walker meet-and-greet", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — baseline: web entry for four tickets plus a meet-and-greet for Hezekiah Walker, Dec 19 at Trilith Live, entry to Dec 6, 2026. Not re-confirmed this week.", end:"Dec 6 (baseline)", source:"https://cmg-cmg-rd-20020-prod.cdn.arcpublishing.com/contests/"}
+      ]},
+      {market:"Atlanta", lane:"black", call:"+14047411079", callLabel:"404-741-1079", frequency:"107.9", name:"Hot", format:"Hip-Hop / R&B", owner:"Urban One", contestsUrl:"https://hotspotatl.com/category/contests/", note:"Official Money Drop callback: 404-741-1079; alternate 404-741-1075. Cluster business: 404-765-9750. Address search-discovered: 101 Marietta St NW, 12th Floor, Atlanta, GA 30303.", contests:[
+        {name:"Radio One Atlanta Money Drop", status:"verified", tags:["cash","online"], desc:"ACTIVE — rules PDF confirms Feb 16–Nov 27, 2026, on WHTA + WAMJ. Enter once per promo period at hotspotatl.com or majicatl.com. The nominee calls 404-741-1079 or 404-741-1075. Prize: $500 if a winner was chosen the previous eligible weekday, else $1,000 — never exceeds $1,000. Sponsor: Law Offices of Julian Lewis Sanders & Associates. ENDS Fri Nov 27, 2026 — urgent.", end:"Nov 27, 2026", source:"https://hotspotatl.com/wp-content/uploads/sites/67/2026/02/17709208093236.pdf"},
+        {name:"The GREAT Grocery Giveaway with 1-800-TruckWreck", status:"verified", tags:["cash"], desc:"Wed Nov 18, 2026: $100 Kroger gift cards to the first 100 listeners at a secret Kroger location. Location announced on the Morning Hustle at 9 AM Nov 18.", end:"Nov 18, 2026", source:"https://hotspotatl.com/category/contests/"},
+        {name:"Morning Hustle Cash Grab", status:"verified", tags:["cash"], desc:"ACTIVE to Dec 18, 2026. Text CASH to 71007; weekdays 7:05 & 8:05; 60 seconds to answer 10 questions. Short code corroborated via the syndicated show’s sister station page; Hot 107.9’s own page was not re-verified this week.", end:"Dec 18, 2026", source:"https://hotspotatl.com/category/contests/"},
+        {name:"The Great Atlanta Band Challenge", status:"unverified", tags:["online"], desc:"UNVERIFIED THIS WEEK — the Oct 16 baseline (voting open for the top 10 high school bands; $10,000 prize; one vote per day) was not re-confirmed Nov 16.", source:"https://hotspotatl.com/category/contests/"}
+      ]},
+      {market:"Atlanta", lane:"black", call:"+14047411079", callLabel:"404-741-1079", frequency:"107.5 / 97.5", name:"Majic", format:"Urban AC · Atlanta’s Best Mix of R&B", owner:"Urban One", note:"Money Drop verified via the shared WHTA/WAMJ rules PDF (co-station with Hot 107.9; enter at majicatl.com; call-in 404-741-1075). All other Majic contests are unverified this week — majicatl.com was not directly loaded Nov 16.", contests:[
+        {name:"Radio One Atlanta Money Drop", status:"verified", tags:["cash","online"], desc:"Verified via the shared WHTA/WAMJ rules PDF — same terms as Hot 107.9, ends Fri Nov 27, 2026. Enter once per promo period at majicatl.com or hotspotatl.com; nominee calls 404-741-1079 or 404-741-1075. Prize $500 / $1,000 per the rules. Sponsor: Law Offices of Julian Lewis Sanders & Associates.", end:"Nov 27, 2026", source:"https://hotspotatl.com/wp-content/uploads/sites/67/2026/02/17709208093236.pdf"}
+      ]},
+      {market:"Atlanta", lane:"black", call:"+14047419833", callLabel:"404-741-9833", frequency:"103.3", name:"V-103", format:"Urban Contemporary · The People’s Station", owner:"Audacy", contestsUrl:"https://www.audacy.com/v103", note:"UNVERIFIED THIS WEEK (Nov 16): audacy.com would not load. Free Money Kitty is ENDED — the latest located rules ran Aug 4–Sep 5, 2025 and no current run was found. All current V-103 contests are unverified this week.", contests:[]},
+      {market:"Atlanta", lane:"mainstream", call:"+14048720750", callLabel:"404-872-0750", frequency:"95.5 / 750", name:"WSB", format:"News / Talk", owner:"Cox Media Group", contestsUrl:"https://www.wsbradio.com/contests/", note:"Studio phone 404-872-0750 carried from baseline, not re-verified Nov 16 (wsbradio.com would not load). All WSB-AM contests are unverified this week. “A Grand for Groceries” ENDED (ran Aug 24–Oct 9, 2026); the Mark Arum Earth, Wind & Fire tickets and Von Haessler Jason Bonham Led Zeppelin Evening windows (Oct 19–23) have passed. Pickup: 1601 W Peachtree St NE, Atlanta. CMG household 30-day rule applies.", contests:[]},
+      {market:"Atlanta", lane:"mainstream", call:"+14048970985", callLabel:"1-404-897-0985", frequency:"98.5", name:"B98.5", format:"90s, 2K & Today", owner:"Cox Media Group", contestsUrl:"https://www.b985.com/contests/", note:"Phone 404-897-0985 carried from baseline, not re-verified Nov 16 (contests index did not load). Pickup: 1601 W Peachtree St NE, Atlanta, weekdays 8:30 AM–5:30 PM, excluding holidays. CMG household 30-day rule applies. The Oct 19–23 on-air items (Kara → Leanne Morgan, Kara → Peter Antoniou + $100, Death Becomes Her, Abby Jessen Matchbox Twenty caller 25, Chris Centore TSO on-air) have ENDED.", contests:[
+        {name:"Tad, Drex & Kara Stuff the Truck Thanksgiving Food Drive 2026", status:"verified", tags:["tickets"], desc:"Sat Nov 21, 2026, 9 AM–3 PM, Publix Alpharetta Commons (4305 State Bridge Rd), benefiting Atlanta Community Food Bank. The first 25 people dropping off a frozen turkey get 2 Trans-Siberian Orchestra tickets (Gas South Arena, Dec 13), ARV $100. GA 18+.", end:"Nov 21, 2026", source:"https://www.b985.com/contests/"},
+        {name:"Matchbox Twenty — four tickets (web)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load. Baseline: web entry, once daily, Oct 13, 2026–Jun 13, 2027; prize four tickets.", end:"Jun 13, 2027 (baseline)", source:"https://www.b985.com/contests/"},
+        {name:"Goo Goo Dolls and Def Leppard — four tickets (web)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load. Baseline: four-ticket web listing; mechanics and dates unpublished.", source:"https://www.b985.com/contests/"},
+        {name:"Trans-Siberian Orchestra — Ghosts of Christmas Eve (web)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load. Baseline: four-ticket web listing; mechanics and dates unpublished.", source:"https://www.b985.com/contests/"},
+        {name:"Featured Teacher", status:"unverified", tags:["online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load. Baseline: Delta Community Credit Union promotion; mechanics and dates unpublished.", source:"https://www.b985.com/contests/"},
+        {name:"Chris Brown & Usher (web)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load; baseline web listing only.", source:"https://www.b985.com/contests/"},
+        {name:"Pentatonix (web)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load. Baseline: four-ticket listing; entry to Dec 3, 2026.", end:"Dec 3 (baseline)", source:"https://www.b985.com/contests/"},
+        {name:"Niall Horan (web)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — contests index did not load. Baseline: four-ticket listing; entry to Apr 20, 2027.", end:"Apr 20, 2027 (baseline)", source:"https://www.b985.com/contests/"}
+      ]},
+      {market:"Atlanta", lane:"mainstream", call:"+14047389797", callLabel:"404-738-9797", frequency:"97.1", name:"The River", format:"Classic Hits", owner:"Cox Media Group", contestsUrl:"https://971theriver.com/contests/", note:"FULLY VERIFIED Nov 16 via the contests index; contest line 404-738-9797 confirmed. Pickup: 1601 W Peachtree St NE, Atlanta, weekdays 8:30 AM–5:30 PM. CMG household 30-day rule applies. ENDED: Iron Maiden weekday (Oct 19–23), CLAYFACE Fandango passes (Oct 19–23), and the TSO + signed-guitar variant (ended Oct 25).", contests:[
+        {name:"Megadeth tickets", status:"verified", tags:["tickets"], desc:"English Nick, weekdays 10 AM–3 PM, Nov 16–20, 2026. Win a pair to Megadeth + Anthrax + Kerry King, June 18 at Ameris Bank Amphitheatre. Call 404-738-9797. 5 winners. GA 18+.", end:"Nov 20, 2026", source:"https://971theriver.com/contests/"},
+        {name:"Fantasy in Lights (Callaway Resort & Gardens)", status:"verified", tags:["tickets"], desc:"Kaedy Kiely afternoons, Nov 16–20, 2026. Win a pair of tickets plus a pair of Trolley ride tickets. Event runs now–Jan 3, 2027. Call 404-738-9797. 5 winners. GA 18+.", end:"Nov 20, 2026", source:"https://971theriver.com/contests/"},
+        {name:"Def Leppard & Goo Goo Dolls — on-air", status:"verified", tags:["tickets"], desc:"Axel Lowe mornings, Nov 16–20, 2026. Win a pair for June 17 at State Farm Arena with The Struts. 5 winners. Call 404-738-9797.", end:"Nov 20, 2026", source:"https://971theriver.com/contests/"},
+        {name:"Up the River, Down the River — jackpot guessing", status:"verified", tags:["cash"], desc:"Started Oct 26, 2026. Weekdays at 8 AM, 1 PM and 4 PM, caller 25 at 404-738-9797 guesses the exact jackpot; 1 guess per person per day. Jackpot #4 is live now — already won: #1 $8,723, #2 $6,388, #3 $10,170. Latest clues Nov 16: 8 AM $7,742 DOWN; 1 PM $7,735 DOWN; 4 PM $7,731 UP.", source:"https://971theriver.com/contests/"},
+        {name:"Def Leppard & Goo Goo Dolls — web (4 tickets)", status:"verified", tags:["tickets","online"], desc:"Web entry, once per day, Oct 8, 2026–Jun 13, 2027. Prize: 4 tickets. Drawing on/about Jun 14, 2027. ARV $200 minimum.", end:"Jun 13, 2027", source:"https://971theriver.com/contests/"},
+        {name:"Trans-Siberian Orchestra — web (4 tickets)", status:"verified", tags:["tickets","online"], desc:"Web entry Nov 9, 2026, 5 AM–Dec 6, 2026, 11:59 PM. Prize: 4 tickets, Gas South Arena Dec 13 (2 shows). ARV $300 minimum. Note: the station’s own rules text says the drawing is “on or about 10/07/26” — likely a typo in the station rules.", end:"Dec 6, 2026", source:"https://971theriver.com/contests/"},
+        {name:"Yacht Rock Holiday Special", status:"verified", tags:["tickets","online"], desc:"Web entry Sep 1–Dec 13, 2026, once per day. Prize: 4 tickets, Dec 19 at Coca-Cola Roxy. Drawing on/about Dec 13. ARV $200.", end:"Dec 13, 2026", source:"https://971theriver.com/contests/"},
+        {name:"Toy Factory Project VIP", status:"verified", tags:["tickets","online"], desc:"Web entry Aug 25–Dec 13, 2026, once per day. Prize: 2 VIP tickets + Marquee Club, Fox Theatre Dec 31. Drawing on/about Dec 13. ARV $200.", end:"Dec 13, 2026", source:"https://971theriver.com/contests/"},
+        {name:"RUSH (national Audacy flyaway)", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED — not on the WSRV contests index Nov 16; WSRV participation in the national Audacy RUSH flyaway is unconfirmed. Baseline listing ran to Nov 15, 2026.", source:"https://971theriver.com/contests/"}
+      ]},
+      {market:"Atlanta", lane:"mainstream", frequency:"94.1", name:"Star", format:"Hot AC", owner:"Audacy", contestsUrl:"https://www.audacy.com/star94atlanta", note:"UNVERIFIED THIS WEEK (Nov 16): audacy.com would not load; all Star 94.1 contests are unverified this week. Contact details 404-261-2970 and 210 Interstate North Circle Suite 100 remain search-discovered.", contests:[]},
+
+      {market:"Augusta", lane:"black", text:"45911", textLabel:"45911", frequency:"97.7", name:"HOT", format:"WHHD-HD2 · Throwback Hip Hop & R&B", owner:"Beasley Media Group", contestsUrl:"https://hotaugusta.com/", rulesUrl:"https://hotaugusta.com/uploads/2018/12/General-Contest-Rules-December-2018-HOT.pdf", note:"UNVERIFIED THIS WEEK (Nov 16): no current contest page surfaced; hotaugusta.com is the real site but its crawl is stale. “Grand In Your Hand” ENDED (stated run Sep 28–Oct 30, 2026 has passed; no extension or replacement found). SCAM SHIELD: hot977.com is a PARKED GoDaddy domain for sale ($7,999) — NOT the station’s site; any contest contact from it is suspect. hot97.com is NYC’s HOT 97 — its “Beat the Buzzer” contest (Nov 11–Dec 11, 2026) is NY/NJ/CT only, not Augusta. Studio line not published online. Cluster business: 706-396-7000. Pickup: 4051 Jimmie Dyess Parkway, Augusta, weekdays 9 AM–5 PM excluding holidays.", contests:[]},
+      {market:"Augusta", lane:"mainstream", call:"+17069229999", callLabel:"706-922-9999", frequency:"99", name:"KICKS", format:"Country", owner:"Beasley Media Group", note:"WKXC Augusta. Official request/call-or-text line. Business: 706-396-7000. Pickup: 4051 Jimmie Dyess Pkwy, Augusta, weekdays 9 AM–5 PM excluding holidays. NOTE: kicks99.net / the Kicks 99.1 Great Gas Giveaway is a DIFFERENT station (KHKX), not Augusta WKXC — do not use it for these contests. ENDED: Guitar Pull Nominate A Teacher (Oct 19–25), Mr. Electric (Sep 21–Nov 5), Autumn Adventure (winner Oct 26).", contests:[
+        {name:"Holiday Party Prep Giveaway — $200 Amazon Gift Card", status:"verified", tags:["cash","online"], desc:"Beasley multimarket. Enter by subscribing to the Kicks 99 newsletter, clicking the contest link in the email, and completing the entry form. Winner selected Nov 23, 2026 — URGENT.", end:"Winner Nov 23, 2026", source:"https://kicks99.com/"},
+        {name:"Snack and Stream — $200 Uber Eats Gift Card", status:"verified", tags:["cash","online"], desc:"Beasley multimarket; published Oct 26, 2026. Same newsletter-email entry: subscribe to the Kicks 99 newsletter, click the contest link in the email, complete the entry form. No winner-selection date stated — end date unverified.", source:"https://kicks99.com/"},
+        {name:"A&D Carpets Guitar Pull raffle — front-row tickets", status:"verified", tags:["tickets","online"], desc:"Charity raffle — entry requires a donation (not free entry). Prize: a pair of FRONT-ROW tickets to the 2026 Kicks 99 Guitar Pull. Enter via OneCause.com, “Team ADP”, donating to Safe Homes of Augusta. Published Oct 26, 2026.", source:"https://kicks99.com/"},
+        {name:"Terry Lambert Hyundai Sticker Spotter", status:"verified", tags:["tickets"], desc:"Get a Kicks 99 bumper sticker, get spotted, win 2026 Guitar Pull tickets. Published Oct 23, 2026; no end date on the page.", source:"https://kicks99.com/"},
+        {name:"Uptown Cheapskate — $300", status:"unverified", tags:["online"], desc:"UNVERIFIED — baseline date Nov 2 has passed and no current page was found Nov 16; not confirmed still running.", source:"https://kicks99.com/"},
+        {name:"Guitar Pull Bud Light Ticket Window", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED THIS WEEK — baseline: listen for the on-air keyword, enter online within 15 minutes, and confirm the “Thank You For Entering” screen. Not re-confirmed Nov 16.", source:"https://kicks99.com/2026/09/21/ticket-window-2/"},
+        {name:"Military Heroes — Win Guitar Pull Tickets", status:"unverified", tags:["tickets"], desc:"TITLE ONLY — details unverified this week (Nov 16)."},
+        {name:"Chevy Saturdays", status:"unverified", tags:["online"], desc:"UNVERIFIED THIS WEEK (Nov 16) — title/baseline only; details not re-confirmed.", source:"https://kicks99.com/"}
+      ]},
+      {market:"Augusta", lane:"mainstream", frequency:"102.7", name:"WZNY", format:"Defunct since Sept 2024", owner:"Not operating", note:"Confirmed not operating: the station has been defunct since September 2024. No contests.", contests:[]},
+
+      {market:"Savannah", lane:"black", frequency:"93", name:"E93", format:"Urban Contemporary · WEAS", owner:"Cumulus Media", contestsUrl:"https://e93fm.com/", note:"No official studio line found. E93 is Cumulus, not iHeart. ENDED: Haunted Cash $2,000 (SoCast national window Oct 1–31, 2026; no longer on the rail). Fall Fund and Greek Step Show remain ended.", contests:[
+        {name:"Savannah Ghost Pirates tickets — Dec 13", status:"listed", tags:["tickets","online"], desc:"Online entry. Prize: family 4-pack to Ghost Pirates vs. Jacksonville Icemen at Enmarket Arena, Dec 13, 2026. Entry deadline is NOT stated on the page — show as unverified.", source:"https://e93fm.com/"},
+        {name:"Give Thanks & Win! — $2,000 cash", status:"listed", tags:["cash","online"], desc:"SoCast partner promo. NATIONAL SHARED prize: one $2,000 winner across all participating stations — NOT $2,000 per station. 1 entry per person per day. Ends Nov 30, 2026 per aggregator listings; the official E93 page states no end date, so Nov 30 is aggregator-sourced, not officially confirmed.", end:"Nov 30, 2026 (aggregator-sourced)", source:"https://e93fm.com/"},
+        {name:"Lil Wayne: 20 Years of Carter Classics — Dec 5, Enmarket Arena", status:"unverified", tags:["tickets"], desc:"UNVERIFIED (Nov 16) — not on the E93 rail and no E93 rules page found; do NOT mark ended from absence. Baseline: “Listen to win tickets!” listing for the Dec 5, 2026 concert at Enmarket Arena.", source:"https://e93fm.com/"}
+      ]},
+      {market:"Savannah", lane:"black", call:"+19129470941", callLabel:"912-947-0941", frequency:"94.1", name:"The Beat", format:"Hip-Hop & R&B · WQBT — Savannah’s #1 for Hip-Hop and R&B", owner:"iHeartMedia", note:"WQBT is 94.1 The Beat (iHeart, 94.1 FM) — it is NOT Q105.3. Q105.3 is WRHQ Quality Rock, a separate station (wrhq.com) with NO active contests (“Check back for upcoming contests”). Phone 912-947-0941 not re-verified this week (Nov 16). Prize pickup: 245 Alfred Street, Savannah, Mon/Wed/Fri 9 AM–2 PM (corroborated via WAEV’s contact page); claim within 10 business days. Current contests UNVERIFIED this week — the contests page renders empty in text fetch (likely JS-rendered); absence is not proof of no contests. ENDED: Lil Wayne Enmarket Arena Talkback (Oct 5–11, 2026) and The R&B Tour Talkback (Oct 24–30, 2026). The iHeart Q4 $1,000 contest ENDED Nov 13, 2026 (see rules decoder / scam shield).", contests:[
+        {name:"Get the Bag", status:"unverified", tags:["cash"], desc:"STATUS UNKNOWN (Nov 16) — Oct 19 baseline rules-page title; not found in current search and NOT confirmed ended. Details unverified."},
+        {name:"iHeartRadio x Cash Money & No Limit VIP Takeover", status:"unverified", tags:["tickets"], desc:"STATUS UNKNOWN (Nov 16) — Oct 19 baseline rules-page title; not found in current search and NOT confirmed ended. Details unverified."},
+        {name:"Ultimate Ghirardelli Entertaining Experience", status:"unverified", tags:["online"], desc:"STATUS UNKNOWN (Nov 16) — Oct 19 baseline rules-page title; not found in current search and NOT confirmed ended. Details unverified."}
+      ]},
+      {market:"Savannah", lane:"mainstream", frequency:"I-95", name:"The Rock of Savannah", format:"Classic Rock · WIXV", owner:"Cumulus Media", contestsUrl:"https://www.i95savannah.com/contests/", note:"No official studio line found. I-95 is Cumulus, not iHeart. ENDED: Haunted Cash and Fall Fund.", contests:[
+        {name:"Give Thanks & Win! — $2,000 cash", status:"listed", tags:["cash","online"], desc:"SoCast partner promo — same terms as E93: NATIONAL SHARED prize (one $2,000 winner across all participating stations, not per station); 1 entry per person per day; ends Nov 30, 2026 per aggregator listings (official page states no end date — Nov 30 is aggregator-sourced, not officially confirmed).", end:"Nov 30, 2026 (aggregator-sourced)", source:"https://www.i95savannah.com/contests/"},
+        {name:"Greta Van Fleet tickets", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED (Nov 16) — no I-95 rules page found and not on the rail; not marked ended. Previous listing: Click n’ Win online entry; show Feb 3 at Enmarket Arena.", source:"https://www.i95savannah.com/contests/"}
+      ]},
+      {market:"Savannah", lane:"mainstream", call:"+19129479730", callLabel:"912-947-9730", frequency:"97.3", name:"KISSFM", format:"Top 40 / CHR · WAEV", owner:"iHeartMedia", note:"Phone 912-947-9730 corroborated Nov 16. Prize pickup: 245 Alfred Street, Savannah, Mon/Wed/Fri 9 AM–2 PM — confirmed on WAEV’s own contact page; claim within 10 business days. ENDED: Harry Styles Together, Together Tour Talkback (Sep 28–Oct 9, 2026; keywords weekdays 10/12/2/4/6 via iHeart Talkback; winner drawn ~Oct 12; pair of tickets, Atlanta May 22, 2027). The iHeart Q4 $1,000 contest ENDED Nov 13, 2026. Current contests page renders empty (likely JS) — titles below are unverified, none confirmed ended.", contests:[
+        {name:"Pay Your Bills / Jingle Ball VIP", status:"unverified", tags:["cash"], desc:"UNVERIFIED (Nov 16) — not found in current site search; not confirmed ended. Rules-page title only."},
+        {name:"Miley Hollywood Bowl Trip", status:"unverified", tags:["tickets"], desc:"UNVERIFIED (Nov 16) — not found in current site search; not confirmed ended. Rules-page title only."},
+        {name:"Jonas Brothers Holiday", status:"unverified", tags:["tickets"], desc:"UNVERIFIED (Nov 16) — not found in current site search; not confirmed ended. Rules-page title only."},
+        {name:"Niall Horan Dinner Party Trip", status:"unverified", tags:["tickets"], desc:"UNVERIFIED (Nov 16) — not found in current site search; not confirmed ended. Rules-page title only."},
+        {name:"Win tickets to see Lil Wayne at Enmarket Arena", status:"unverified", tags:["tickets"], desc:"UNVERIFIED (Nov 16) — not found in current site search; not confirmed ended. Title only; do NOT assume the ended WQBT Talkback dates apply here."},
+        {name:"Ultimate Ghirardelli Entertaining Experience", status:"unverified", tags:["online"], desc:"UNVERIFIED (Nov 16) — not found in current site search; not confirmed ended. Title only."},
+        {name:"Dave’s Hot Chicken For a Year — possible national promo", status:"unverified", tags:["online"], desc:"UNVERIFIED — aggregator-sourced only, NOT verified on a Savannah station page. Aggregator listing: Nov 13–Dec 13, 2026; $1,300 gift card grand prize + 50 × $310; entry at iheartradio.com/daveshotchicken. Confirm on an official iHeart/station page before entering."}
+      ]},
+
+      {market:"Macon–Warner Robins", lane:"black", frequency:"92.3", name:"Macon", format:"Hip Hop / Urban · WLZN", owner:"Cumulus Media", contestsUrl:"https://www.macon923.com/", note:"UNVERIFIED THIS WEEK (Nov 16): the page renders no contest list and no live contests are visible. Haunted Cash ENDED Oct 31, 2026; Fall Fund ENDED Oct 11, 2026. The Bryson Tiller Presents post is legacy, not a contest. Contact details remain search-discovered.", contests:[
+        {name:"Haunted Cash Giveaway!", status:"unverified", tags:["cash","online"], desc:"ENDED Oct 31, 2026 nationally — and it was NOT LISTED on WLZN while live. Kept here flagged unverified / not listed for WLZN only; do not treat Haunted Cash as available on this station.", source:"https://www.macon923.com/"}
+      ]},
+      {market:"Macon–Warner Robins", lane:"mainstream", frequency:"99.1", name:"WDEN", format:"Country", owner:"Cumulus Media", contestsUrl:"https://www.wden.com/category/contests/", rulesUrl:"https://www.macon923.com/2024/11/23/99-wden-contest-rules/", note:"UNVERIFIED THIS WEEK (Nov 16): the contests page rendered empty — the WDEN live list is unverified this week. ENDED: Haunted Cash (national Oct 1–Oct 31, 2026) and the Thomas Rhett Las Vegas trip (rules archive Oct 12–23; date passed, no extension). Reliable Staycation remains ended (Jun 19); Fall Fund remains ended (Sep 21–Oct 11). Third-party contest line 478-646-9999 and cluster office details are not official.", contests:[]},
+      {market:"Macon–Warner Robins", lane:"mainstream", frequency:"93.7", name:"Z", format:"Adult Contemporary · WPEZ", owner:"Cumulus Media", contestsUrl:"https://www.z937.com/contests/", note:"UNVERIFIED THIS WEEK (Nov 16): the page rendered only a stale 2015 item — the live list is unverified this week. ENDED: Haunted Cash (Oct 1–Oct 31, 2026).", contests:[]},
+      {market:"Macon–Warner Robins", lane:"mainstream", frequency:"95.1", name:"B", format:"Top 40 / CHR · WMGB", owner:"Cumulus Media", contestsUrl:"https://www.allthehitsb951.com/contests/", note:"UNVERIFIED THIS WEEK (Nov 16): the page served a stale Apr 18, 2025 crawl — the live list is unverified this week. ENDED: Haunted Cash (Oct 1–Oct 31, 2026). Note: /category/contests/ still returns 404.", contests:[]},
+
+      {market:"Columbus", lane:"mainstream", call:"+17063221077", callLabel:"706-322-1077", frequency:"107.3", name:"Q", format:"Contemporary Hit Radio · WCGQ", owner:"PMB Broadcasting", note:"UNVERIFIED AGAIN (Nov 16): no contest page or contest content found; the home page renders only “Loading Songs”. REGISTRY CORRECTION TO CHECK: the registry lists WCGQ as 99.5, but Wikipedia lists WCGQ as 107.3 FM “Q107.3” (PMB Broadcasting) — the frequency in this app has NOT been changed pending confirmation; the discrepancy is noted here only. Office: 706-327-1217. Request lines: 706-322-1077 or 866-841-1077. Address: 1820 Wynnton Road, Columbus, GA 31904.", contests:[]},
+      {market:"Columbus", lane:"mainstream", call:"+17065965400", callLabel:"706-596-5400", text:"30382", textLabel:"30382", frequency:"540", name:"News Radio", format:"News / Talk · WDAK", owner:"iHeartMedia", contestsUrl:"https://newsradio540.iheart.com/promotions/", note:"UNVERIFIED THIS WEEK (Nov 16): no WDAK contest/rules page was reachable. “Grand in Your Hand” (Q4 $1,000) ENDED Fri Nov 13, 2026, 9:54:59 PM ET per national rules; no replacement cash-keyword contest found. Contacts 706-596-5400 / 706-576-3000 / text 30382 were NOT re-verified this week. Pickup baseline: 1501 13th Ave., Columbus, weekdays 9 AM–5 PM, closed federal holidays.", contests:[
+        {name:"Ultimate Ghirardelli Entertaining Experience", status:"unverified", tags:["online"], desc:"UNVERIFIED (Nov 16) — the Ghirardelli listing was not re-verified this week. Rules-page title only."}
+      ]},
+
+      {market:"Albany", lane:"black", frequency:"96.3", name:"WJIZ", format:"Urban Contemporary · Hip Hop & R&B", owner:"iHeartMedia", contestsUrl:"https://wjiz.iheart.com/promotions/", rulesUrl:"https://wjiz.iheart.com/rules/", note:"Business 229-439-9704 not re-verified this week (Nov 16). Pickup: 809 S Westover Blvd., Albany, GA 31707, weekdays 9 AM–5 PM, closed federal holidays. “Get the Bag” (Q4 $1,000) ENDED Nov 13, 2026 — the title still listed on the rules page is stale. Fountain City Classic tickets ENDED — the game was played Sat Nov 7, 2026. Carrol’s is still NOT listed — unverified / possibly ended. The WJIZ-branded clementine-anma.xyz redirect was not seen this week; the standing caution remains — avoid any such link.", contests:[
+        {name:"Dave’s Hot Chicken for a Year (Hot Boxes)", status:"verified", tags:["online"], desc:"National iHeart sweepstakes, Nov 13–Dec 13, 2026. Enter via the iHeartRadio app / iheartradio.com/daveshotchicken; daily entry. 151 winners; grand prize $1,300 in Dave’s gift cards. Title verified on the official rules page; dates/prize detail per iHeart rules as cited by aggregators.", end:"Dec 13, 2026", source:"https://wjiz.iheart.com/rules/"},
+        {name:"Shoe Station gift cards", status:"listed", tags:["online"], desc:"KEPT LISTED — details unverified: enter to win one of five $50 gift cards to Shoe Station. Dates and mechanics unverified Nov 16."},
+        {name:"iHeartRadio x Cash Money & No Limit VIP Takeover Sweepstakes", status:"unverified", tags:["tickets"], desc:"KEPT LISTED — title only; details unverified Nov 16."},
+        {name:"The Holidays Taste Better with Ghirardelli", status:"unverified", tags:["online"], desc:"KEPT LISTED — title only; details unverified Nov 16."},
+        {name:"Share Your HBCU Homecoming Pride!", status:"unverified", tags:["online"], desc:"TITLE ONLY (Nov 16) — dates and mechanics unverified."},
+        {name:"Enter to Win Carrol’s Sausage & Country Store Gift Card!", status:"unverified", tags:["online"], desc:"STILL NOT LISTED (Nov 16) — unverified / possibly ended. Baseline: the entry link went off-site to www.carrollssausage.com; third-party details are unverified; never provide credit-card information to enter."}
+      ]},
+      {market:"Albany", lane:"mainstream", text:"37337", textLabel:"37337", frequency:"94.7", name:"WOBB", format:"Country · B100", owner:"iHeartMedia", contestsUrl:"https://b100wobb.iheart.com/promotions/", rulesUrl:"https://b100wobb.iheart.com/rules/", note:"WOBB is 94.7 FM, Albany. Business 229-439-9704 and text 37337 not re-verified this week (Nov 16); the text number is for general contact and is not verified as a contest-entry number. Pickup: 809 S Westover Blvd., Albany, weekdays 9 AM–5 PM. “9K Payday” (Q4 $1,000) ENDED Nov 13, 2026 — the title still listed is stale. Ultimate iHeartCountry Christmas Vacation 2026 ENDED — entries closed Sun Nov 15, 2026, 11:59:59 PM ET; drawing Nov 16 ($3,993 trip for two, flights + 3 nights Caesars Palace Dec 9–12, 2026, Thomas Rhett Dec 10, Luke Bryan & Jason Aldean Double Down Dec 11). Carrol’s still NOT listed — unverified / possibly ended.", contests:[
+        {name:"Dave’s Hot Chicken for a Year (Hot Boxes)", status:"verified", tags:["online"], desc:"National iHeart sweepstakes — same as WJIZ: Nov 13–Dec 13, 2026, daily entry via the iHeartRadio app / iheartradio.com/daveshotchicken. 151 winners; grand prize $1,300 in Dave’s gift cards (detail per iHeart rules as cited by aggregators).", end:"Dec 13, 2026", source:"https://b100wobb.iheart.com/rules/"},
+        {name:"What’s Cooking With Piggly Wiggly", status:"unverified", tags:["online"], desc:"KEPT LISTED — title only; details unverified Nov 16."},
+        {name:"The Holidays Taste Better with Ghirardelli", status:"unverified", tags:["online"], desc:"KEPT LISTED — title only; details unverified Nov 16."},
+        {name:"iHeartCountry Chris Janson FUN Flyaway Sweepstakes", status:"unverified", tags:["tickets"], desc:"TITLE ONLY (Nov 16) — dates and prize details unverified."},
+        {name:"Share Your Personal Veterans Day Salute", status:"unverified", tags:["online"], desc:"TITLE ONLY (Nov 16) — dates/prize details unverified. Veterans Day was Nov 11; this is likely ended/closing."},
+        {name:"Kenny Chesney Tampa Tour Kickoff Experience", status:"unverified", tags:["tickets"], desc:"NOT LISTED THIS WEEK (Nov 16) — unverified / possibly ended on absence only; NOT confirmed ended. Title-level baseline only."},
+        {name:"Carrol’s Sausage & Country Store Gift Card", status:"unverified", tags:["online"], desc:"STILL NOT LISTED (Nov 16) — unverified / possibly ended. Baseline: the entry link went off-site to www.carrollssausage.com; third-party details are unverified; never provide credit-card information to enter."}
+      ]},
+
+      {market:"Athens", lane:"mainstream", call:"+18008491061", callLabel:"1-800-849-1061", frequency:"106.1", name:"Your Georgia Country", format:"Country · WNGC", owner:"Cox Radio Athens", note:"UNVERIFIED THIS WEEK (Nov 16) — the official WNGC site would not load; the station is marked unverified this week. Official station line: 1-800-849-1061. “Country Cash Grab” ENDED (national Fall 2026 Cash Contest ran Sep 21–Oct 23, 2026). CMG Atlanta cluster rules do not apply here.", contests:[
+        {name:"Home for the Holidays 2027 — mortgage/rent paid for a year", status:"unverified", tags:["cash","online"], desc:"UNVERIFIED — NOT confirmed on WNGC’s own page. National Audience LLC sweepstakes, Nov 2–Dec 16, 2026: enter to win mortgage or rent paid for a year, up to $18,000; enter daily via radiocontest.com or a participating station’s website; 18+; one national winner; drawing on/around Dec 17, 2026. WNGC’s participation is secondary-sourced only (an EIN newswire index lists a Nov 1, 2026 item sourced to 106.1 WNGC).", end:"Dec 16, 2026 (unverified for WNGC)"},
+        {name:"Jon Pardi — listen-to-win", status:"unverified", tags:["tickets"], desc:"UNVERIFIED (Nov 16) — the Oct 19–23 listen-to-win window has passed and it could not be confirmed on a WNGC page this week; do not carry as verified live."},
+        {name:"Zach Bryan — Enter to Win", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED (Nov 16) — not confirmable on a WNGC page this week; do not carry as verified live. Baseline: enter online Oct 15, 2026–May 23, 2027; 1 winner receives tickets (ARV $120) to the May 29, 2027 show at Mercedes-Benz Stadium. Georgia residents, 18+.", end:"May 23, 2027 (baseline)"},
+        {name:"Enter to win: Tickets to Kenny Chesney!", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED — rotated off; no longer listed; not formally ended. Details unverified Nov 16."},
+        {name:"Enter to win: tickets to see ALABAMA!", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED — rotated off; no longer listed; not formally ended. Details unverified Nov 16."},
+        {name:"106.1 WNGC Has Your Family 4 Pack Tickets to Dreamland!", status:"unverified", tags:["tickets","online"], desc:"UNVERIFIED — rotated off; no longer listed; not formally ended. Details unverified Nov 16."}
+      ]}
+    ];
+
+    const MARKET_ORDER = ["Atlanta","Augusta","Savannah","Macon–Warner Robins","Columbus","Albany","Athens"];
+    const marketList = document.getElementById("market-list");
+    const resultLine = document.getElementById("result-line");
+    const noResults = document.getElementById("no-results");
+    let activeFilter = "all";
+
+    function safeLink(url, label, cls) {
+      if (!url) return "";
+      return '<a class="' + (cls || "source-link") + '" href="' + url + '" target="_blank" rel="noopener">' + label + '</a>';
+    }
+    function confidenceLabel(status) {
+      return status === "verified" ? "Verified" : status === "listed" ? "Listed · details unverified" : "Unverified";
+    }
+    function contestMatches(contest, filter) {
+      return filter === "all" || contest.tags.includes(filter);
+    }
+    function stationMatches(station, filter) {
+      if (filter === "all") return true;
+      if (filter === "black" || filter === "mainstream") return station.lane === filter;
+      return station.contests.some(function(c){ return contestMatches(c, filter); });
+    }
+    function renderStation(station) {
+      const visibleContests = station.contests.filter(function(c){ return contestMatches(c, activeFilter) || activeFilter === "black" || activeFilter === "mainstream" || activeFilter === "all"; });
+      const contacts = [];
+      if (station.call) contacts.push('<a class="contact-link" href="tel:' + station.call + '">Call ' + station.callLabel + '</a>');
+      if (station.text) contacts.push('<a class="contact-link" href="sms:' + station.text + '">Text ' + station.textLabel + '</a>');
+      if (station.contestsUrl) contacts.push(safeLink(station.contestsUrl,"Contest page","contact-link"));
+      if (station.rulesUrl) contacts.push(safeLink(station.rulesUrl,"Rules","contact-link"));
+      const contests = visibleContests.length ? visibleContests.map(function(c){
+        const tags = c.tags.map(function(t){ return '<span class="meta-tag">' + (t === "online" ? "Enter online" : t.charAt(0).toUpperCase()+t.slice(1)) + '</span>'; }).join("");
+        const provenance = c.source ? safeLink(c.source,"Official source") : '<span class="verified-date">Source: official station page · URL not captured</span>';
+        return '<article class="contest"><div class="contest-head"><h4>' + c.name + '</h4><span class="confidence ' + c.status + '">' + confidenceLabel(c.status) + '</span></div><p class="contest-desc">' + c.desc + '</p><div class="contest-meta">' + tags + (c.end ? '<span class="meta-tag">Ends ' + c.end + '</span>' : '') + '</div><div class="contest-footer">' + provenance + '<span class="verified-date">Checked Nov 16, 2026</span></div></article>';
+      }).join("") : '<div class="empty-state">No active contest record for this station in the Nov 16, 2026 scout. Where the station page would not load, the station note above flags its list as unverified this week rather than empty.</div>';
+      return '<article class="station-card"><div class="station-top"><div class="frequency">' + station.frequency + '</div><div class="station-name"><h3>' + station.name + '</h3><p>' + station.format + ' · ' + station.owner + '</p><div class="station-chips"><span class="chip ' + station.lane + '">' + (station.lane === "black" ? "Black Radio" : "Mainstream") + '</span><span class="chip">' + station.contests.length + ' record' + (station.contests.length === 1 ? '' : 's') + '</span></div></div></div><div class="station-actions">' + contacts.join("") + '</div><p class="station-note">' + station.note + '</p><div class="contest-list">' + contests + '</div></article>';
+    }
+    function render() {
+      let stationCount = 0;
+      let contestCount = 0;
+      const html = MARKET_ORDER.map(function(market, marketIndex){
+        const stations = STATIONS.filter(function(s){ return s.market === market && stationMatches(s, activeFilter); });
+        if (!stations.length) return "";
+        stationCount += stations.length;
+        stations.forEach(function(s){
+          if (activeFilter === "all" || activeFilter === "black" || activeFilter === "mainstream") contestCount += s.contests.length;
+          else contestCount += s.contests.filter(function(c){ return contestMatches(c, activeFilter); }).length;
+        });
+        const slug = market.toLowerCase().replace(/[^a-z]+/g,"-").replace(/^-|-$/g,"");
+        const isOpen = marketIndex < 2 || activeFilter !== "all";
+        return '<details class="market" id="market-' + slug + '" ' + (isOpen ? 'open' : '') + '><summary><div><div class="market-name">' + market + '</div><div class="market-meta">' + stations.length + ' station' + (stations.length === 1 ? '' : 's') + '</div></div><span class="market-chevron" aria-hidden="true">⌄</span></summary><div class="market-body">' + stations.map(renderStation).join("") + '</div></details>';
+      }).join("");
+      marketList.innerHTML = html;
+      noResults.classList.toggle("hidden", stationCount !== 0);
+      resultLine.textContent = "Showing " + stationCount + " station" + (stationCount === 1 ? "" : "s") + " and " + contestCount + " contest record" + (contestCount === 1 ? "" : "s") + ".";
+    }
+    document.getElementById("filters").addEventListener("click", function(event){
+      const button = event.target.closest("button[data-filter]");
+      if (!button) return;
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll("button[data-filter]").forEach(function(item){ item.setAttribute("aria-pressed", item === button ? "true" : "false"); });
+      render();
+    });
+
+    let activeDirectoryFilter = "all";
+    function directoryMatches(station, filter) {
+      const format = station.format.toLowerCase();
+      if (filter === "all") return true;
+      if (filter === "black") return station.lane === "black";
+      if (filter === "urbanac") return format.includes("urban ac");
+      if (filter === "hiphop") return format.includes("hip-hop") || format.includes("hip hop") || format.includes("r&b") || format.includes("urban contemporary");
+      if (filter === "pop") return format.includes("top 40") || format.includes("hot ac") || format.includes("adult contemporary") || format.includes("contemporary hit");
+      if (filter === "country") return format.includes("country");
+      if (filter === "rock") return format.includes("rock") || format.includes("classic hits");
+      if (filter === "talk") return format.includes("news") || format.includes("talk");
+      return false;
+    }
+    function renderDirectory() {
+      const stations = STATIONS.filter(function(station){ return directoryMatches(station, activeDirectoryFilter); });
+      const grid = document.getElementById("directory-grid");
+      grid.innerHTML = stations.map(function(station){
+        const contacts = [];
+        if (station.call) contacts.push('<a class="contact-link" href="tel:' + station.call + '">Call ' + station.callLabel + '</a>');
+        if (station.text) contacts.push('<a class="contact-link" href="sms:' + station.text + '">Text ' + station.textLabel + '</a>');
+        if (station.contestsUrl) contacts.push(safeLink(station.contestsUrl,"Contest page","contact-link"));
+        if (station.rulesUrl) contacts.push(safeLink(station.rulesUrl,"Rules","contact-link"));
+        return '<article class="directory-card"><span class="directory-market">' + station.market + '</span><div class="directory-station"><span class="directory-frequency">' + station.frequency + '</span><h3>' + station.name + '</h3></div><p class="directory-format">' + station.format + ' · ' + station.owner + '</p><div class="station-chips"><span class="chip ' + station.lane + '">' + (station.lane === "black" ? "Black Radio" : "Mainstream") + '</span><span class="chip">' + station.contests.length + ' contest record' + (station.contests.length === 1 ? '' : 's') + '</span></div><div class="station-actions">' + contacts.join("") + '</div></article>';
+      }).join("");
+      const marketCount = new Set(stations.map(function(station){ return station.market; })).size;
+      document.getElementById("directory-count").textContent = stations.length;
+      document.getElementById("directory-count-label").textContent = "station" + (stations.length === 1 ? "" : "s") + " across " + marketCount + " market" + (marketCount === 1 ? "" : "s");
+      document.getElementById("directory-result").textContent = "Showing " + stations.length + " station" + (stations.length === 1 ? "" : "s") + ".";
+      document.getElementById("directory-empty").classList.toggle("hidden", stations.length !== 0);
+    }
+    document.getElementById("directory-filters").addEventListener("click", function(event){
+      const button = event.target.closest("button[data-dir-filter]");
+      if (!button) return;
+      activeDirectoryFilter = button.dataset.dirFilter;
+      document.querySelectorAll("button[data-dir-filter]").forEach(function(item){ item.setAttribute("aria-pressed", item === button ? "true" : "false"); });
+      renderDirectory();
+    });
+
+    function showPage(page, scrollTarget) {
+      const requestedView = document.querySelector('.page-view[data-page="' + page + '"]');
+      if (!requestedView) return;
+      document.querySelectorAll(".page-view").forEach(function(view){
+        const isActive = view === requestedView;
+        view.classList.toggle("hidden", !isActive);
+        view.setAttribute("aria-hidden", isActive ? "false" : "true");
+      });
+      document.querySelectorAll(".page-tab").forEach(function(tab){
+        if (tab.dataset.pageTarget === page) tab.setAttribute("aria-current", "page");
+        else tab.removeAttribute("aria-current");
+      });
+      requestAnimationFrame(function(){
+        const target = scrollTarget ? document.getElementById(scrollTarget) : null;
+        if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+        else window.scrollTo({top:0, left:0, behavior:"smooth"});
+      });
+    }
+    document.querySelectorAll("[data-page-target]").forEach(function(trigger){
+      trigger.addEventListener("click", function(event){
+        event.preventDefault();
+        showPage(trigger.dataset.pageTarget, trigger.dataset.scrollTarget || "");
+      });
+    });
+
+    render();
+    renderDirectory();
+    document.querySelectorAll(".page-view").forEach(function(view){
+      view.setAttribute("aria-hidden", view.classList.contains("hidden") ? "true" : "false");
+    });
+  </script>
+</body>
+</html>
